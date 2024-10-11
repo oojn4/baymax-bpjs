@@ -71,7 +71,7 @@ const answerOptions = [
     id: 1,
     name: 'Selalu',
     description: 'Selalu',
-    icon: '🔄' // Continuous or repeat icon to represent "always"
+    icon: '🔄' // Continuous or repeat icon to represent ""
   },
   {
     id: 2,
