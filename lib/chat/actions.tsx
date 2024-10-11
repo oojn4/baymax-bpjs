@@ -7,32 +7,35 @@ import 'server-only'
 import {
   createAI,
   createStreamableUI,
-  getMutableAIState,
+  createStreamableValue,
   getAIState,
-  createStreamableValue
+  getMutableAIState
 } from 'ai/rsc'
 
 import { BotCard, BotMessage } from '@/components/stocks'
 
-import { nanoid, sleep } from '@/lib/utils'
 import { saveChat } from '@/app/actions'
-import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
-import { Chat } from '../types'
 import { auth } from '@/auth'
-import { FlightStatus } from '@/components/flights/flight-status'
-import { SelectSeats } from '@/components/flights/select-seats'
-import { ListFlights } from '@/components/flights/list-flights'
 import { BoardingPass } from '@/components/flights/boarding-pass'
+import { Destinations } from '@/components/flights/destinations'
+import { FlightStatus } from '@/components/flights/flight-status'
+import { ListFlights } from '@/components/flights/list-flights'
 import { PurchaseTickets } from '@/components/flights/purchase-ticket'
+import { SelectSeats } from '@/components/flights/select-seats'
+import { Video } from '@/components/media/video'
+import { ListQuestionnaireFAS } from '@/components/questionnaire/list-questionnaire-fas'
+import { ListQuestionnairePHQ15 } from '@/components/questionnaire/list-questionnaire-phq15'
+import { ListQuestionnaireSSD } from '@/components/questionnaire/list-questionnaire-ssd'
+
+import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { CheckIcon, SpinnerIcon } from '@/components/ui/icons'
-import { format } from 'date-fns'
-import { streamText } from 'ai'
+import { nanoid, sleep } from '@/lib/utils'
 import { google } from '@ai-sdk/google'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { streamText } from 'ai'
+import { format } from 'date-fns'
 import { z } from 'zod'
-import { ListHotels } from '@/components/hotels/list-hotels'
-import { Destinations } from '@/components/flights/destinations'
-import { Video } from '@/components/media/video'
+import { Chat } from '../types'
 import { rateLimit } from './ratelimit'
 
 const genAI = new GoogleGenerativeAI(
@@ -202,7 +205,15 @@ async function submitUserMessage(content: string) {
               date: z.string()
             })
           },
-          showHotels: {
+          showQuestionnairePHQ15: {
+            description: 'Show the UI to choose a hotel for the trip.',
+            parameters: z.object({ city: z.string() })
+          },
+          showQuestionnaireFAS: {
+            description: 'Show the UI to choose a hotel for the trip.',
+            parameters: z.object({ city: z.string() })
+          },
+          showQuestionnaireSSD: {
             description: 'Show the UI to choose a hotel for the trip.',
             parameters: z.object({ city: z.string() })
           },
@@ -369,7 +380,7 @@ async function submitUserMessage(content: string) {
                 <SelectSeats summary={args} />
               </BotCard>
             )
-          } else if (toolName === 'showHotels') {
+          } else if (toolName === 'showQuestionnairePHQ15') {
             aiState.done({
               ...aiState.get(),
               interactions: [],
@@ -379,9 +390,9 @@ async function submitUserMessage(content: string) {
                   id: nanoid(),
                   role: 'assistant',
                   content:
-                    "Here's a list of hotels for you to choose from. Select one to proceed to payment.",
+                    "Mulai asesmen PHQ15",
                   display: {
-                    name: 'showHotels',
+                    name: 'showQuestionnairePHQ15',
                     props: {}
                   }
                 }
@@ -390,7 +401,55 @@ async function submitUserMessage(content: string) {
 
             uiStream.update(
               <BotCard>
-                <ListHotels />
+                <ListQuestionnairePHQ15 />
+              </BotCard>
+            )
+          } else if (toolName === 'showQuestionnaireSSD') {
+            aiState.done({
+              ...aiState.get(),
+              interactions: [],
+              messages: [
+                ...aiState.get().messages,
+                {
+                  id: nanoid(),
+                  role: 'assistant',
+                  content:
+                    "Mulai asesmen SSD",
+                  display: {
+                    name: 'showQuestionnaireSSD',
+                    props: {}
+                  }
+                }
+              ]
+            })
+
+            uiStream.update(
+              <BotCard>
+                <ListQuestionnairePHQ15 />
+              </BotCard>
+            )
+          } else if (toolName === 'showQuestionnaireFAS') {
+            aiState.done({
+              ...aiState.get(),
+              interactions: [],
+              messages: [
+                ...aiState.get().messages,
+                {
+                  id: nanoid(),
+                  role: 'assistant',
+                  content:
+                    "Mulai asesmen FAS",
+                  display: {
+                    name: 'showQuestionnaireFAS',
+                    props: {}
+                  }
+                }
+              ]
+            })
+
+            uiStream.update(
+              <BotCard>
+                <ListQuestionnairePHQ15 />
               </BotCard>
             )
           } else if (toolName === 'checkoutBooking') {
@@ -655,29 +714,17 @@ export const getUIStateFromAIState = (aiState: Chat) => {
       id: `${aiState.chatId}-${index}`,
       display:
         message.role === 'assistant' ? (
-          message.display?.name === 'showFlights' ? (
+          message.display?.name === 'showQuestionnairePHQ15' ? (
             <BotCard>
-              <ListFlights summary={message.display.props.summary} />
+              <ListQuestionnairePHQ15 />
             </BotCard>
-          ) : message.display?.name === 'showSeatPicker' ? (
+          ) : message.display?.name === 'showQuestionnaireSSD' ? (
             <BotCard>
-              <SelectSeats summary={message.display.props.summary} />
+              <ListQuestionnaireSSD />
             </BotCard>
-          ) : message.display?.name === 'showHotels' ? (
+          ) : message.display?.name === 'showQuestionnaireFAS' ? (
             <BotCard>
-              <ListHotels />
-            </BotCard>
-          ) : message.content === 'The purchase has completed successfully.' ? (
-            <BotCard>
-              <PurchaseTickets status="expired" />
-            </BotCard>
-          ) : message.display?.name === 'showBoardingPass' ? (
-            <BotCard>
-              <BoardingPass summary={message.display.props.summary} />
-            </BotCard>
-          ) : message.display?.name === 'listDestinations' ? (
-            <BotCard>
-              <Destinations destinations={message.display.props.destinations} />
+              <ListQuestionnaireFAS />
             </BotCard>
           ) : (
             <BotMessage content={message.content} />

@@ -1,21 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
-import * as React from 'react'
 import Link from 'next/link'
+import * as React from 'react'
 
-import { cn } from '@/lib/utils'
 import { auth } from '@/auth'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
-  IconGitHub,
-  IconNextChat,
-  IconSeparator,
-  IconVercel
+  IconSeparator
 } from '@/components/ui/icons'
 import { UserMenu } from '@/components/user-menu'
+import { Session } from '@/lib/types'
+import { ChatHistory } from './chat-history'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
-import { ChatHistory } from './chat-history'
-import { Session } from '@/lib/types'
 
 async function UserOrLogin() {
   const session = (await auth()) as Session
@@ -30,7 +26,7 @@ async function UserOrLogin() {
         </>
       ) : (
         <Link href="/new" rel="nofollow">
-          <img className="size-6" src="/images/gemini.png" alt="gemini logo" />
+          <img className="size-6" src="/images/baymax.png" alt="gemini logo" />
         </Link>
       )}
       <div className="flex items-center">
@@ -56,7 +52,10 @@ export function Header() {
         </React.Suspense>
       </div>
       <div className="flex items-center justify-end gap-2">
-        <Button asChild size="sm" variant="ghost">
+        <b>BAYMAX</b>
+        <img className="size-12" src="/images/baymax.png" alt="gemini logo" />
+      
+        {/* <Button asChild size="sm" variant="ghost">
           <a
             target="_blank"
             href="https://github.com/vercel-labs/gemini-chatbot"
@@ -75,7 +74,7 @@ export function Header() {
             <span className="hidden sm:block">Deploy to Vercel</span>
             <span className="sm:hidden">Deploy</span>
           </a>
-        </Button>
+        </Button> */}
       </div>
     </header>
   )

@@ -1,18 +1,18 @@
 import * as React from 'react'
 
 import { shareChat } from '@/app/actions'
-import { Button } from '@/components/ui/button'
-import { PromptForm } from '@/components/prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
-import { IconShare } from '@/components/ui/icons'
-import { FooterText } from '@/components/footer'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
-import { useAIState, useActions, useUIState } from 'ai/rsc'
+import { FooterText } from '@/components/footer'
+import { PromptForm } from '@/components/prompt-form'
+import { Button } from '@/components/ui/button'
+import { IconShare } from '@/components/ui/icons'
 import type { AI } from '@/lib/chat/actions'
-import { nanoid } from 'nanoid'
-import { UserMessage } from './stocks/message'
 import { cn } from '@/lib/utils'
+import { useAIState, useActions, useUIState } from 'ai/rsc'
+import { nanoid } from 'nanoid'
 import { toast } from 'sonner'
+import { UserMessage } from './stocks/message'
 
 export interface ChatPanelProps {
   id?: string
@@ -38,15 +38,18 @@ export function ChatPanel({
 
   const exampleMessages = [
     {
-      heading: 'List flights flying from',
-      subheading: 'San Francisco to Rome today',
-      message: `List flights flying from San Francisco to Rome today`
+      heading: 'Mulai asesmen PHQ15',
+      subheading: 'Mulai asesmen PHQ15',
+      message: `Jalankan ListQuestionnairePHQ15`
+    },{
+      heading: 'Mulai asesmen FAS',
+      subheading: 'Mulai asesmen FAS',
+      message: `Jalankan ListQuestionnaireFAS`
+    },{
+      heading: 'Mulai asesmen SSD',
+      subheading: 'Mulai asesmen SSD',
+      message: `Jalankan ListQuestionnaireSSD`
     },
-    {
-      heading: 'What is the status',
-      subheading: 'of flight BA142?',
-      message: 'What is the status of flight BA142?'
-    }
   ]
 
   return (
